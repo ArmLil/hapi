@@ -7,7 +7,7 @@ const Api = require('./api')
 
 server.connection({
   port: process.env.PORT || 3000,
-  host: 'localhost' 
+  host: 'localhost'
 })
 
 server.register(require('inert'), (err) => {
@@ -25,14 +25,27 @@ server.register(require('inert'), (err) => {
 
     server.route({
         method: 'GET',
-        path: '/search',
+        path: '/search/',
         handler: Api.search,
         config: {
           validate: {
             query: {
               term: Joi.string(),
               offset: Joi.number(),
-              limit: Joi.number(),
+              limit: Joi.number()
+            }
+          }
+        }
+    })
+
+    server.route({
+        method: 'GET',
+        path: '/search/single/',
+        handler: Api.single,
+        config: {
+          validate: {
+            query: {
+              photo_id: Joi.number(),
             }
           }
         }

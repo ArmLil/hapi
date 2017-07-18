@@ -32,7 +32,19 @@ server.register(require('inert'), (err) => {
             query: {
               term: Joi.string(),
               offset: Joi.number(),
-              limit: Joi.number(),
+              limit: Joi.number()
+            }
+          }
+        }
+    })
+
+    server.route({
+        method: 'GET',
+        path: '/search/single/',
+        handler: Api.single,
+        config: {
+          validate: {
+            query: {
               photo_id: Joi.number(),
             }
           }

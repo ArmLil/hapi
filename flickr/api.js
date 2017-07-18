@@ -2,9 +2,12 @@
 const request = require('request-promise')
 const Boom = require('boom')
 
+const Utils = require('./common/utils')
+
 const FLICKR_ROOT = 'https://api.flickr.com/services/rest/?'
-const FLICKR_METHOD_SEARCH_PHOTO = 'flickr.photos.search'
-const FLICKR_METHOD_SEARCH_PHOTO_ID = 'flickr.photos.getInfo'
+const FLICKR_METHOD_PHOTOS_SEARCH = 'flickr.photos.search'
+const FLICKR_METHOD_PHOTOS_GET_INFO = 'flickr.photos.getInfo'
+const FLICKR_METHOD_PHOTOS_GET_SIZES = 'flickr.photos.getSizes'
 //const FLICKR_PHOTO_URL = 'https://api.flickr.com/services/rest/?method=flickr.photos.getInfo&api_key=035845d8f12006199c3942da46accecc&photo_id=35156805504&format=json&nojsoncallback=1';
 
 let config = {}
@@ -28,7 +31,7 @@ Api.search = (req, reply) => {
   const limit = req.query.limit
 
   let uri = `${FLICKR_ROOT}`
-      uri += `method=${FLICKR_METHOD_SEARCH_PHOTO}`
+      uri += `method=${FLICKR_METHOD_PHOTOS_SEARCH}`
       uri += `&api_key=${config.flickrApiKey}`
       uri += `&tags=${term}`
       uri += `&per_page=${limit}`
@@ -46,12 +49,36 @@ Api.search = (req, reply) => {
     .catch(error => reply(Boom.badRequest(error)))
 }
 
+Api.size = (id) => {
+  let uri = `${FLICKR_ROOT}`
+      uri += `method=${FLICKR_METHOD_PHOTOS_GET_SIZES}`
+      uri += `&api_key=${config.flickrApiKey}`
+      uri += `&photo_id=${id}`
+      uri += `&format=json&nojsoncallback=1`
+
+  let options = {
+    uri,
+    json: true,
+  }
+
+  return request(options)
+    .then(response => {
+      let size = response.sizes.size[response.sizes.size.length-1]
+      let orientation = Utils.getImageOrientation(size.width, size.height)
+
+      return {
+        orientation,
+        width: size.width,
+        height: size.height,
+      }
+    })
+}
 
 Api.single = (req, reply) => {
   const id = req.params.id
 
   let uri = `${FLICKR_ROOT}`
-      uri += `method=${FLICKR_METHOD_SEARCH_PHOTO_ID}`
+      uri += `method=${FLICKR_METHOD_PHOTOS_GET_INFO}`
       uri += `&api_key=${config.flickrApiKey}`
       uri += `&photo_id=${id}`
       uri += `&format=json&nojsoncallback=1`
@@ -62,6 +89,10 @@ Api.single = (req, reply) => {
   }
 
   return request(options)    
+    .then(response => {
+      return Api.size(response.photo.id)
+        .then(size => Object.assign({}, response.photo, size))
+    })
     .then(reply)
     .catch(error => reply(Boom.badRequest(error)))
 }

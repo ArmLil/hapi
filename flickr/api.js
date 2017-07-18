@@ -49,11 +49,11 @@ Api.search = (req, reply) => {
     .catch(error => reply(Boom.badRequest(error)))
 }
 
-Api.size = (id) => {
+Api.dimensions = (flickrResponse) => {
   let uri = `${FLICKR_ROOT}`
       uri += `method=${FLICKR_METHOD_PHOTOS_GET_SIZES}`
       uri += `&api_key=${config.flickrApiKey}`
-      uri += `&photo_id=${id}`
+      uri += `&photo_id=${flickrResponse.photo.id}`
       uri += `&format=json&nojsoncallback=1`
 
   let options = {
@@ -63,15 +63,16 @@ Api.size = (id) => {
 
   return request(options)
     .then(response => {
-      let size = response.sizes.size[response.sizes.size.length-1]
-      let orientation = Utils.getImageOrientation(size.width, size.height)
+      let dimensions = response.sizes.size[response.sizes.size.length-1]
+      let orientation = Utils.getImageOrientation(dimensions.width, dimensions.height)
 
       return {
         orientation,
-        width: size.width,
-        height: size.height,
+        width: dimensions.width,
+        height: dimensions.height,
       }
     })
+    .then(dimensions => Object.assign({}, flickrResponse, dimensions))
 }
 
 Api.single = (req, reply) => {
@@ -88,11 +89,8 @@ Api.single = (req, reply) => {
     json: true,
   }
 
-  return request(options)    
-    .then(response => {
-      return Api.size(response.photo.id)
-        .then(size => Object.assign({}, response.photo, size))
-    })
+  return request(options)
+    .then(Api.dimensions)
     .then(reply)
     .catch(error => reply(Boom.badRequest(error)))
 }

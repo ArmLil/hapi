@@ -25,14 +25,14 @@ server.register(require('inert'), (err) => {
 
     server.route({
         method: 'GET',
-        path: '/search/',
+        path: '/search',
         handler: Api.search,
         config: {
           validate: {
             query: {
               term: Joi.string(),
-              offset: Joi.number(),
-              limit: Joi.number()
+              offset: Joi.number().min(0).default(0),
+              limit: Joi.number().min(1).max(200).default(60)
             }
           }
         }
@@ -40,13 +40,13 @@ server.register(require('inert'), (err) => {
 
     server.route({
         method: 'GET',
-        path: '/search/single/',
+        path: '/search/{id}',
         handler: Api.single,
         config: {
           validate: {
-            query: {
-              photo_id: Joi.number(),
-            }
+            params: {
+              id: Joi.string()
+            }            
           }
         }
     })

@@ -4,7 +4,7 @@ const Utils = require('./utils')
 let Normalize = {}
 module.exports = Normalize
 
-Normalize.flickr = (data) => {  
+Normalize.flickr = (data) => {
   const SOURCE_NAME = 'flickr'
   let raw = data.photo
   let processed = {}  
@@ -24,6 +24,8 @@ Normalize.flickr = (data) => {
   // processed.tiny = raw.tiny
   // processed.thumb = raw.thumb
   // processed.large = raw.large
+  processed.original = data.original || null
+
   // processed.largeWatermarked = raw.large_watermarked || null
   // processed.url = raw.url
 
@@ -55,6 +57,6 @@ Normalize.flickr = (data) => {
       sourceName: SOURCE_NAME,
       result: processed,
     },
-    {original: raw}
+    {raw}
    )
 }

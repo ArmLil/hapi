@@ -64,15 +64,16 @@ Api.dimensions = (flickrResponse) => {
   }
 
   return request(options)
-    .then(response => {
+    .then(response => {      
       let dimensions = response.sizes.size[response.sizes.size.length-1]
-      let orientation = Utils.getImageOrientation(dimensions.width, dimensions.height)
+      let orientation = Utils.getImageOrientation(dimensions.width, dimensions.height)      
       return {
         orientation,
         width: parseInt(dimensions.width),
         height: parseInt(dimensions.height),
+        original: dimensions.source,
       }
-    })
+    })    
     .then(dimensions => Object.assign({}, flickrResponse, dimensions))
 }
 

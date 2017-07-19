@@ -41,12 +41,12 @@ server.register(require('inert'), (err) => {
     server.route({
         method: 'GET',
         path: '/search/{id}',
-        handler: Api.single,
+        handler: Api.haystackFormat,
         config: {
           validate: {
             params: {
               id: Joi.string()
-            }            
+            }
           }
         }
     })

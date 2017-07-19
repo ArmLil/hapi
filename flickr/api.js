@@ -54,7 +54,7 @@ Api.dimensions = (flickrResponse) => {
   let uri = `${FLICKR_ROOT}`
       uri += `method=${FLICKR_METHOD_PHOTOS_GET_SIZES}`
       uri += `&api_key=${config.flickrApiKey}`
-      uri += `&photo_id=${flickrResponse.contentId}`
+      uri += `&photo_id=${flickrResponse.photo.id}`
       uri += `&format=json&nojsoncallback=1`
   //console.log(uri)
 
@@ -69,57 +69,16 @@ Api.dimensions = (flickrResponse) => {
       let orientation = Utils.getImageOrientation(dimensions.width, dimensions.height)
       return {
         orientation,
-        width: dimensions.width,
-        height: dimensions.height,
+        width: parseInt(dimensions.width),
+        height: parseInt(dimensions.height),
       }
     })
     .then(dimensions => Object.assign({}, flickrResponse, dimensions))
 }
 
-Api.haystackFormat = (req, reply) => {
-  const start = new Date()
-  const id = req.params.id
-
-  let uri = `${FLICKR_ROOT}`
-      uri += `method=${FLICKR_METHOD_PHOTOS_GET_INFO}`
-      uri += `&api_key=${config.flickrApiKey}`
-      uri += `&photo_id=${id}`
-      uri += `&format=json&nojsoncallback=1`
-
-  let options = {
-    uri,
-    json: true,
-  }
-  return request(options)
-
-  .then(e => {
-                const took = new Date().getTime() - start.getTime()
-                let contentId = e.photo.id
-                let sourceName = 'Flickr'
-                let result = {
-                  contentId,
-                  sourceName,
-                }
-                return {
-                  took,
-                  contentId,
-                  sourceName,
-                  result,
-                }
-              }
-            )
-  .then(Api.dimensions)
-  .then(r => {
-    //console.log(r)
-    reply(r)
-  })
-  .catch(error => reply(Boom.badRequest(error)))
-}
-
-
-/*
 Api.single = (req, reply) => {
   const id = req.params.id
+  const start = new Date().getTime()
 
   let uri = `${FLICKR_ROOT}`
       uri += `method=${FLICKR_METHOD_PHOTOS_GET_INFO}`
@@ -133,8 +92,10 @@ Api.single = (req, reply) => {
   }
 
   return request(options)
+    .then(flickrResponse => Object.assign({}, flickrResponse, {took: ((new Date().getTime()) - start)}))
     .then(Api.dimensions)
+    .then(Normalize.flickr)
     .then(reply)
     .catch(error => reply(Boom.badRequest(error)))
 }
-*/
+

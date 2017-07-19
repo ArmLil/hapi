@@ -41,7 +41,7 @@ server.register(require('inert'), (err) => {
     server.route({
         method: 'GET',
         path: '/search/{id}',
-        handler: Api.haystackFormat,
+        handler: Api.single,
         config: {
           validate: {
             params: {

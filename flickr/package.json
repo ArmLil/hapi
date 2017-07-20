@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./node_modules/.bin/eslint app/"
   },
   "author": "",
   "license": "ISC",
@@ -21,6 +21,11 @@
     "timezone": "^1.0.6"
   },
   "devDependencies": {
-    "nodemon": "^1.11.0"
+    "nodemon": "^1.11.0",
+    "eslint": "^3.3.1",
+    "eslint-config-airbnb-base": "^5.0.2",
+    "eslint-import-resolver-webpack": "^0.5.1",
+    "eslint-plugin-import": "^1.14.0",
+    "eslint-plugin-react": "^6.2.0"
   }
 }

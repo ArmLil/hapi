@@ -1,0 +1,71 @@
+{
+    "rules": {
+        "no-useless-escape": 0,
+        "import/no-extraneous-dependencies": [
+         "error",
+         {
+          "devDependencies": true,
+          "optionalDependencies": true,
+          "peerDependencies": true
+         }
+        ],
+        "indent": [
+            2,
+            2,
+            {
+              "SwitchCase": 1
+            }
+        ],
+        "quotes": [
+            2,
+            "single"
+        ],
+        "linebreak-style": [
+            2,
+            "unix"
+        ],
+        "max-len": 0,
+        "semi": [
+            2,
+            "never"
+        ],
+        "no-unused-vars": [
+          "error", {
+            "vars": "all",
+            "args": "after-used"
+          }
+        ],
+        "func-names": [
+          "error",
+          "never"
+        ],
+        "no-underscore-dangle": [
+          "error", {
+            "allowAfterThis": true
+          }
+        ],
+        "arrow-body-style": [
+          "error",
+          "as-needed"
+        ],
+       "consistent-return": 1,
+       "no-restricted-syntax": [
+          "error",
+          "WithStatement"
+        ]
+    },
+    "env": {
+        "es6": true,
+        "browser": true
+    },
+    "extends": ["eslint:recommended", "airbnb-base"],
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true,
+            "experimentalObjectRestSpread": true
+        }
+    },
+    "plugins": [
+        "react"
+    ]
+}

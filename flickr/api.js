@@ -64,18 +64,39 @@ Api.dimensions = (flickrResponse) => {
   }
 
   return request(options)
-    .then(response => {      
+    .then(response => {
+      let arr_sizes = response.sizes.size
+      //console.log(arr)
+      let get_tiny = arr_sizes.filter(e => e.label === 'Thumbnail')
+      let get_thumb = arr_sizes.filter(e => e.label === 'Medium')
+      let get_large = arr_sizes.filter(e => e.label === 'Large 2048')
+      let tiny = get_tiny[0].source
+      let thumb = get_thumb[0].source
+      let large = get_large[0].source
       let dimensions = response.sizes.size[response.sizes.size.length-1]
-      let orientation = Utils.getImageOrientation(dimensions.width, dimensions.height)      
+      let orientation = Utils.getImageOrientation(dimensions.width, dimensions.height)
       return {
+        tiny,
+        thumb,
+        large,
         orientation,
         width: parseInt(dimensions.width),
         height: parseInt(dimensions.height),
         original: dimensions.source,
       }
-    })    
+    })
     .then(dimensions => Object.assign({}, flickrResponse, dimensions))
 }
+
+
+
+Api.keywords = (flickrResponse) => {
+  let arr_tags = flickrResponse.photo.tags.tag
+  let arr_keywords = []
+  arr_tags.map(e => arr_keywords.push(e._content))
+  return Object.assign({}, flickrResponse, {keywords: arr_keywords})
+}
+
 
 Api.single = (req, reply) => {
   const id = req.params.id
@@ -95,8 +116,8 @@ Api.single = (req, reply) => {
   return request(options)
     .then(flickrResponse => Object.assign({}, flickrResponse, {took: ((new Date().getTime()) - start)}))
     .then(Api.dimensions)
+    .then(Api.keywords)
     .then(Normalize.flickr)
     .then(reply)
     .catch(error => reply(Boom.badRequest(error)))
 }
-

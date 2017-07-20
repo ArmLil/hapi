@@ -1,63 +1,57 @@
-'use strict'
 const Utils = require('./utils')
 
-let Normalize = {}
+const Normalize = {}
 module.exports = Normalize
 
 Normalize.flickr = (data) => {
-  //console.log(data);
   const SOURCE_NAME = 'flickr'
-  let raw = data.photo
-  let processed = {}
+  const photo = data.photo
+  const processed = {}
 
-  processed.contentId = raw.id
+  processed.contentId = photo.id
   processed.hayId = Utils.getImageID(SOURCE_NAME, processed.contentId)
   processed.sourceName = SOURCE_NAME
   processed.collection = null
 
-  processed.name = raw.title._content
-  processed.description = raw.description._content
-  processed.creator = raw.owner.realname
+  processed.name = photo.title._content // eslint-disable-line no-underscore-dangle
+  processed.description = photo.description._content // eslint-disable-line no-underscore-dangle
+  processed.creator = photo.owner.realname || photo.owner.username
 
   processed.keywords = data.keywords
-  //processed.keywordsSearch = null
+  processed.keywordsSearch = null
 
-  processed.tiny = data.tiny
-  processed.thumb = data.thumb
-  processed.large = data.large
+  processed.tiny = data.tiny || null
+  processed.thumb = data.thumb || null
+  processed.large = data.large || null
   processed.original = data.original || null
 
-  // processed.largeWatermarked = raw.large_watermarked || null
-  processed.url = raw.urls.url[0]._content
+  processed.url = photo.urls.url[0]._content // eslint-disable-line no-underscore-dangle
 
   processed.width = data.width === 0 ? 1000 : data.width
   processed.height = data.height === 0 ? 1000 : data.height
   processed.orientation = data.orientation || 2
 
-  processed.dateSource = raw.dates.posted
-  processed.dateCamera = raw.dates.taken
+  processed.dateSource = new Date(photo.dates.posted * 1000)
+  processed.dateCamera = new Date(photo.dates.taken)
 
-  processed.license = raw.license
-  // processed.modelRelease = null
-  // processed.propertyRelease = null
-  // processed.commercial = null
-  // processed.editorial = null
-  // processed.readyToBuy = null
+  processed.license = data.license
+  processed.modelRelease = null
+  processed.propertyRelease = null
+  processed.commercial = null
+  processed.editorial = data.license === 2 ||
+    (data.license >= 20 && data.license <= 30)
+  processed.readyToBuy = false
 
   // processed.exif = null
   // processed.iptc = null
-  // processed.publish = raw.publish
-  // processed.rating = null
+  processed.publish = false
 
-  // processed.rating = null
-
-  return Object.assign({},
-    {
-      took: data.took,
-      contentId: raw.id,
-      sourceName: SOURCE_NAME,
-      result: processed,
-    },
-    {raw}
-   )
+  return Object.assign({}, {
+    took: data.took,
+    contentId: photo.id,
+    sourceName: SOURCE_NAME,
+    result: processed,
+  }, {
+    raw: photo,
+  })
 }
